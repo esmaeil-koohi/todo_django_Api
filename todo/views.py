@@ -1,12 +1,17 @@
 from django.shortcuts import render
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Todo
-from .serializer import TodoSerializer
+from .serializer import TodoSerializer, UserSerializer
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import mixins, generics
+from rest_framework import viewsets
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 @api_view(['GET', 'POST'])
@@ -116,5 +121,40 @@ class TodosDetailMixinApiView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin
 
     def delete(self, request: Request, pk):
         return self.destroy(request, pk)
+
+
+# endregion
+
+# region generics
+class TodoGenericApiViewPagination(PageNumberPagination):
+    page_size = 1
+
+
+class TodoGenericApiView(generics.ListCreateAPIView):
+    queryset = Todo.objects.order_by('priority').all()
+    serializer_class = TodoSerializer
+    pagination_class = TodoGenericApiViewPagination
+
+
+class TodoGenericDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Todo.objects.order_by('priority').all()
+    serializer_class = TodoSerializer
+
+
+# endregion
+
+# region viewsets
+
+class TodoViewSetApiView(viewsets.ModelViewSet):
+    queryset = Todo.objects.all()
+    serializer_class = TodoSerializer
+
+
+# endregion
+
+# region users
+class UserGenericApiView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 # endregion

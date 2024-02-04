@@ -10,6 +10,8 @@ from rest_framework.views import APIView
 from rest_framework import mixins, generics
 from rest_framework import viewsets
 from django.contrib.auth import get_user_model
+from rest_framework.authentication import BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 User = get_user_model()
 
@@ -134,6 +136,8 @@ class TodoGenericApiView(generics.ListCreateAPIView):
     queryset = Todo.objects.order_by('priority').all()
     serializer_class = TodoSerializer
     pagination_class = TodoGenericApiViewPagination
+    # authentication_classes = [BasicAuthentication]
+    # permission_classes = [IsAuthenticated]
 
 
 class TodoGenericDetailView(generics.RetrieveUpdateDestroyAPIView):
